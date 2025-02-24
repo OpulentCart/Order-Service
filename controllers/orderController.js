@@ -41,10 +41,16 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// Get the order
-exports.getOrderByCustomerId = async (req, res) => {
+// Get all the orders of the Customer
+exports.getAllOrdersByCustomerId = async (req, res) => {
     try{
-
+        const user_id  = req.user.user_id;
+        const orders = await Order.findAll({ where: { user_id: user_id }});
+        return res.status(200).json({
+            success: true,
+            message: "Orders are retrieved successfully",
+            orders
+        });
     }catch(error){
         console.error("Error in sending an order", error.message);
         return res.status(500).json({
@@ -52,3 +58,5 @@ exports.getOrderByCustomerId = async (req, res) => {
         });
     }
 };
+
+// Get the order items by the order id
