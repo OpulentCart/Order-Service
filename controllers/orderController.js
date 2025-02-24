@@ -54,7 +54,8 @@ exports.getAllOrdersByCustomerId = async (req, res) => {
     }catch(error){
         console.error("Error in sending an order", error.message);
         return res.status(500).json({
-            
+            success: false,
+            message: "Failed to get orders for the customer"
         });
     }
 };
