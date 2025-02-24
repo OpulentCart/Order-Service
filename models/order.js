@@ -1,14 +1,14 @@
-const { Datatypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
 
 const Order = sequelize.define('Order', {
     order_id : {
-        type: Datatypes.INTEGER,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     user_id: {
-        type: Datatypes.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: 'auth_app_customuser',
@@ -17,16 +17,16 @@ const Order = sequelize.define('Order', {
         onDelete: 'CASCADE'
     },
     total_amount: {
-        type: Datatypes.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     status: {
-        type: Datatypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
+        type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
         defaultValue: 'pending',
         allowNull: false
     },
     delivery_date: {
-        type: Datatypes.DATE,
+        type: DataTypes.DATE,
         allowNull: true
     }
 }, {
