@@ -25,6 +25,22 @@ const Order = sequelize.define('Order', {
         defaultValue: 'pending',
         allowNull: false
     },
+    street_address: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    city: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    state: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    country: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     delivery_date: {
         type: DataTypes.DATE,
         allowNull: true

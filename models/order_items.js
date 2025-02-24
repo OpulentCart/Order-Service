@@ -28,9 +28,13 @@ const OrderItems = sequelize.define('OrderItems', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    price: {
+    unit_price: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    subtotal: {
+        type: DataTypes.INTEGER,
+        allowNull: false   
     }
 }, {
     tableName: 'order_items',
