@@ -60,3 +60,20 @@ exports.getAllOrdersByCustomerId = async (req, res) => {
 };
 
 // Get the order items by the order id
+exports.getOrderItemsByOrderId = async (req, res) => {
+    try{
+        const { order_id } = req.params;
+        const order_items = await OrderItems.findOne({ where: { order_id: order_id }});
+        return res.status(200).json({
+            success: true,
+            message: "All order-items are retrieved successfully",
+            order_items
+        });
+    }catch(error){
+        console.error("Error in retreiving the order- items", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve all the order-items"
+        });
+    }
+};
