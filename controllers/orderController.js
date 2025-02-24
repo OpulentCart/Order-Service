@@ -28,14 +28,27 @@ exports.createOrder = async (req, res) => {
         }));
         await OrderItems.bulkCreate(orderItems);
 
-        
-
         return res.status(201).json({
             success: true,
             message: "Order is placed successfully"
         });
     }catch(error){
         console.error("Error in creating a new order", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to place an Order"
+        });
+    }
+};
 
+// Get the order
+exports.getOrderByCustomerId = async (req, res) => {
+    try{
+
+    }catch(error){
+        console.error("Error in sending an order", error.message);
+        return res.status(500).json({
+            
+        });
     }
 };
