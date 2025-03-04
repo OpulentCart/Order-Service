@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const { connectDB } = require("./config/dbConfig");
+const { processOrders } = require("./config/rabbitmqConfig");
 require("dotenv").config();
 
 // middleware
@@ -10,6 +11,9 @@ app.use(cors());
 
 // connect to the database
 connectDB();
+
+// connect to RabbitMQ
+processOrders();
 
 app.use("/orders", require("./routes/orderRoutes"));
 
