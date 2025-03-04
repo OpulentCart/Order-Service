@@ -119,7 +119,7 @@ exports.updateStatusOfOrderItem = async (req, res) => {
             return res.status(400).json({ success: false, message: "Order ID and status are required" });
         }
 
-        const updatedOrder = await OrderItem.update(
+        const updatedOrder = await OrderItems.update(
             { status },
             { where: { order_item_id: id } }
         );
