@@ -64,27 +64,31 @@ exports.getOrCreateAddress = async (street, city, state, country, pincode) => {
     }
 };
 
-exports.getOrderedProductsForVendorUser = async (vendorUserId) => {
+exports.getOrderedProductsForVendorUser = async (user_id) => {
     try {
+        console.log("✅ User ID received in SQL query:", user_id, "Type:", typeof user_id);
+
         const results = await sequelize.query(
             `SELECT oi.order_item_id, oi.status, oi.quantity, 
                     p.product_id, p.name AS product_name, p.price, 
-                    o.order_id, o.user_id AS customer_id, o.created_at AS order_date
+                    o.order_id, o.user_id AS customer_id
              FROM order_items oi
              JOIN product p ON oi.product_id = p.product_id
-             JOIN orders o ON oi.order_id = o.order_id
+             JOIN public."order" o ON oi.order_id = o.order_id
              JOIN vendors v ON p.vendor_id = v.vendor_id
-             WHERE v.user_id = :vendorUserId`,
+             WHERE v.user_id = :user_id`,
             {
-                replacements: { vendorUserId },
-                type: Sequelize.QueryTypes.SELECT,
+                replacements: { user_id },  // Ensure user_id is correctly passed
+                type: QueryTypes.SELECT,
             }
         );
 
         return results;
     } catch (error) {
-        console.error("❌ Error fetching ordered products for vendor user:", error.message);
+        console.error("❌ SQL Query Error:", error.message);
         return [];
     }
 };
+
+
 

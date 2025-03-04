@@ -1,5 +1,6 @@
 const Order = require('../models/order');
 const OrderItems = require('../models/order_items');
+const { getOrderedProductsForVendorUser } = require("../utils/sequelizeUtils");
 
 // Create an order
 exports.createOrder = async (req, res) => {
@@ -81,45 +82,55 @@ exports.getOrderItemsByOrderId = async (req, res) => {
 
 // Get the ordered products for the Vendor
 exports.getOrderedProductOfVendor = async (req, res) => {
-
-};
-
-// change the status of the order-item product
-exports.updateStatusOfOrderItem = async (req, res) => {
     try {
-        const { status } = req.body; // Get order item ID and new status
-        const { id } = req.params;
-        const validStatuses = ['pending', 'shipped', 'delivered', 'canceled']; 
+        const user_id  = req.user.user_id; // Ensure user is authenticated
+        console.log('Request User ID:', user_id); // Log user_id for debugging
 
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid status value',
-            });
-        }
+        const orderedProducts = await getOrderedProductsForVendorUser(user_id);
+        console.log('Ordered Products:', orderedProducts); // Log the result
 
-        const orderItem = await OrderItems.findByPk(id);
-
-        if (!orderItem) {
+        if (!orderedProducts.length) {
             return res.status(404).json({
                 success: false,
-                message: 'Order item not found',
+                message: 'No ordered products found for this vendor.',
             });
         }
-
-        await orderItem.update({ status });
 
         return res.status(200).json({
             success: true,
-            message: 'Order item status updated successfully',
-            orderItem,
+            orderedProducts,
         });
 
     } catch (error) {
-        console.error('Error updating order item status:', error.message);
+        console.error('Error fetching ordered products for vendor:', error.message);
         res.status(500).json({
             success: false,
             error: 'Internal Server Error',
         });
+    }
+};
+
+exports.updateStatusOfOrderItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!id || !status) {
+            return res.status(400).json({ success: false, message: "Order ID and status are required" });
+        }
+
+        const updatedOrder = await OrderItem.update(
+            { status },
+            { where: { order_item_id: id } }
+        );
+
+        if (!updatedOrder[0]) {
+            return res.status(404).json({ success: false, message: "Order item not found" });
+        }
+
+        return res.status(200).json({ success: true, message: "Order status updated successfully" });
+    } catch (error) {
+        console.error("❌ Error updating order status:", error.message);
+        return res.status(500).json({ success: false, message: "Failed to update order status", error: error.message });
     }
 };
