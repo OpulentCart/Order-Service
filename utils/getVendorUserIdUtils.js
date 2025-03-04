@@ -1,23 +1,19 @@
 const { Sequelize } = require("sequelize");
-const sequelize = require("../config/dbConfig");
+const sequelize = require("../config/db"); // Sequelize instance
 
-async function getVendorUserId(productId) {
+exports.getVendorUserId = async (product_id) => {
     try {
-        const query = `
-            SELECT v.user_id 
-            FROM product p
-            JOIN vendors v ON p.vendor_id = v.vendor_id
-            WHERE p.product_id = :productId
-        `;
+        const [result] = await sequelize.query(
+            `SELECT v.user_id 
+             FROM vendors v
+             JOIN product p ON v.vendor_id = p.vendor_id
+             WHERE p.product_id = :product_id`,
+            { replacements: { product_id }, type: Sequelize.QueryTypes.SELECT }
+        );
 
-        const result = await sequelize.query(query, {
-            type: Sequelize.QueryTypes.SELECT,
-            replacements: { productId },
-        });
-
-        return result.length > 0 ? result[0].user_id : null;
+        return result ? result.user_id : null;
     } catch (error) {
-        console.error("❌ Error fetching vendor user_id:", error);
+        console.error("❌ Error fetching vendor user_id:", error.message);
         return null;
     }
-}
+};
