@@ -20,25 +20,17 @@ const Order = sequelize.define('Order', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    address_id:{
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references:{
+            model: 'address',
+            key: 'address_id'
+        }
+    },
     status: {
         type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
         defaultValue: 'pending',
-        allowNull: false
-    },
-    street_address: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    city: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    state: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    country: {
-        type: DataTypes.STRING,
         allowNull: false
     },
     delivery_date: {
