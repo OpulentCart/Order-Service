@@ -63,3 +63,28 @@ exports.getOrCreateAddress = async (street, city, state, country, pincode) => {
         throw error;
     }
 };
+
+exports.getOrderedProductsForVendorUser = async (vendorUserId) => {
+    try {
+        const results = await sequelize.query(
+            `SELECT oi.order_item_id, oi.status, oi.quantity, 
+                    p.product_id, p.name AS product_name, p.price, 
+                    o.order_id, o.user_id AS customer_id, o.created_at AS order_date
+             FROM order_items oi
+             JOIN product p ON oi.product_id = p.product_id
+             JOIN orders o ON oi.order_id = o.order_id
+             JOIN vendors v ON p.vendor_id = v.vendor_id
+             WHERE v.user_id = :vendorUserId`,
+            {
+                replacements: { vendorUserId },
+                type: Sequelize.QueryTypes.SELECT,
+            }
+        );
+
+        return results;
+    } catch (error) {
+        console.error("❌ Error fetching ordered products for vendor user:", error.message);
+        return [];
+    }
+};
+

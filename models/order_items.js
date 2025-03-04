@@ -36,6 +36,11 @@ const OrderItems = sequelize.define('OrderItems', {
     subtotal: {
         type: DataTypes.INTEGER,
         allowNull: false   
+    },
+    status:{
+        type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
+        defaultValue: 'pending',
+        allowNull: false
     }
 }, {
     tableName: 'order_items',

@@ -78,3 +78,13 @@ exports.getOrderItemsByOrderId = async (req, res) => {
         });
     }
 };
+
+// Get the ordered products for the Vendor
+exports.getOrderedProductOfVendor = async (req, res) => {
+
+};
+
+// change the status of the order-item product
+exports.updateStatusOfOrderItem = async (req, res) => {
+    
+} 
