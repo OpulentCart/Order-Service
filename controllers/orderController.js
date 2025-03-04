@@ -86,5 +86,40 @@ exports.getOrderedProductOfVendor = async (req, res) => {
 
 // change the status of the order-item product
 exports.updateStatusOfOrderItem = async (req, res) => {
-    
-} 
+    try {
+        const { status } = req.body; // Get order item ID and new status
+        const { id } = req.params;
+        const validStatuses = ['pending', 'shipped', 'delivered', 'canceled']; 
+
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status value',
+            });
+        }
+
+        const orderItem = await OrderItems.findByPk(id);
+
+        if (!orderItem) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order item not found',
+            });
+        }
+
+        await orderItem.update({ status });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Order item status updated successfully',
+            orderItem,
+        });
+
+    } catch (error) {
+        console.error('Error updating order item status:', error.message);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error',
+        });
+    }
+};
