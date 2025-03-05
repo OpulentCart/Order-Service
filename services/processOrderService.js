@@ -2,6 +2,8 @@ const amqp = require("amqplib");
 const Order = require("../models/order");
 const OrderItems = require("../models/order_items");
 const { getVendorUserId, getOrCreateAddress } = require("../utils/sequelizeUtils");
+const { sendOrderConfirmationMail } = require("./orderMailService");
+const { sequelize } = require("../config/dbConfig");
 
 const RABBITMQ_URL = "amqp://localhost"; // Change if using cloud-based RabbitMQ
 const ORDER_QUEUE = "orders";
@@ -34,7 +36,8 @@ exports.processOrders = async () => {
                         user_id,
                         total_amount: total_price,
                         address_id,
-                        payment_id
+                        payment_id,
+                        delivery_date: new Date(new Date().setDate(new Date().getDate() + 10))
                     });
 
                     // Insert into OrderItems table
@@ -72,6 +75,20 @@ exports.processOrders = async () => {
 
                     // Acknowledge the message
                     channel.ack(msg);
+                    
+                    // fetching user mail address
+                    const query = `SELECT c.email FROM auth_app_customuser c WHERE c.id = :user_id`;
+                    const userEmail = await sequelize.query(query,{
+                        replacements: { user_id },  
+                        type: QueryTypes.SELECT,
+                    });
+                    // Send Order confirmation mail to the customer
+                    await sendOrderConfirmationMail({
+                        to: userEmail,
+                        order_id: order.order_id,
+                        totalAmount: order.total_amount,
+                        deliveryDate: order.delivery_date.toDateString()
+                    });
                 } catch (error) {
                     console.error("❌ Error processing order:", error.message);
                     channel.nack(msg, false, true); // Requeue message on failure
