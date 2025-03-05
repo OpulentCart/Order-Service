@@ -30,7 +30,7 @@ const Order = sequelize.define('Order', {
     },
     payment_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'payments',
             key: 'payment_id'
@@ -55,7 +55,7 @@ const Order = sequelize.define('Order', {
     timestamps: true
 });
 
-sequelize.sync({ alter: true})
+sequelize.sync({ alter: false})
     .then(() => {
         console.log("Order table created")
     })

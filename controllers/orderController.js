@@ -65,7 +65,7 @@ exports.getAllOrdersByCustomerId = async (req, res) => {
 exports.getOrderItemsByOrderId = async (req, res) => {
     try{
         const { order_id } = req.params;
-        const order_items = await OrderItems.findOne({ where: { order_id: order_id }});
+        const order_items = await OrderItems.findAll({ where: { order_id: order_id }});
         return res.status(200).json({
             success: true,
             message: "All order-items are retrieved successfully",
@@ -127,6 +127,38 @@ exports.updateStatusOfOrderItem = async (req, res) => {
         if (!updatedOrder[0]) {
             return res.status(404).json({ success: false, message: "Order item not found" });
         }
+
+         // Get the order_id of the updated item
+         const orderItem = await OrderItems.findOne({ where: { order_item_id: id } });
+         if (!orderItem) {
+             return res.status(404).json({ success: false, message: "Order item not found" });
+         }
+ 
+         const orderId = orderItem.order_id;
+
+         // Fetch all items related to this order
+        const orderItems = await OrderItems.findAll({ where: { order_id: orderId } });
+
+        // Extract all statuses of the order items
+        const allStatuses = orderItems.map(item => item.status);
+
+        let newOrderStatus = "pending"; // Default status
+
+        if (allStatuses.every(status => status === "delivered")) {
+            newOrderStatus = "delivered";
+        } else if (allStatuses.every(status => status === "shipped")) {
+            newOrderStatus = "shipped";
+        } else if (allStatuses.includes("shipped") && allStatuses.every(status => status === "delivered" || status === "shipped")) {
+            newOrderStatus = "shipped";
+        } else if (allStatuses.includes("pending")) {
+            newOrderStatus = "pending";
+        }
+
+        // Update the main Order table
+        await Order.update(
+            { status: newOrderStatus },
+            { where: { order_id: orderId } }
+        );
 
         return res.status(200).json({ success: true, message: "Order status updated successfully" });
     } catch (error) {

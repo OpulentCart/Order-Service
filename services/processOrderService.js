@@ -4,6 +4,7 @@ const OrderItems = require("../models/order_items");
 const { getVendorUserId, getOrCreateAddress } = require("../utils/sequelizeUtils");
 const { sendOrderConfirmationMail } = require("./orderMailService");
 const { sequelize } = require("../config/dbConfig");
+const { QueryTypes } = require("sequelize");
 
 const RABBITMQ_URL = "amqp://localhost"; // Change if using cloud-based RabbitMQ
 const ORDER_QUEUE = "orders";
@@ -78,10 +79,18 @@ exports.processOrders = async () => {
                     
                     // fetching user mail address
                     const query = `SELECT c.email FROM auth_app_customuser c WHERE c.id = :user_id`;
-                    const userEmail = await sequelize.query(query,{
+                    const result = await sequelize.query(query, {
                         replacements: { user_id },  
                         type: QueryTypes.SELECT,
                     });
+                    
+                    // Extract email from the first result
+                    const userEmail = result.length > 0 ? result[0].email : null;
+                    
+                    if (!userEmail) {
+                        console.error("❌ No email found for user:", user_id);
+                        return;
+                    }
                     // Send Order confirmation mail to the customer
                     await sendOrderConfirmationMail({
                         to: userEmail,
