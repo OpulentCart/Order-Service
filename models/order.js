@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
 
 const Order = sequelize.define('Order', {
@@ -27,6 +27,19 @@ const Order = sequelize.define('Order', {
             model: 'address',
             key: 'address_id'
         }
+    },
+    payment_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'payments',
+            key: 'payment_id'
+        }
+    },
+    order_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
     },
     status: {
         type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),

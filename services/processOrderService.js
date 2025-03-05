@@ -20,7 +20,7 @@ exports.processOrders = async () => {
                 const orderData = JSON.parse(msg.content.toString());
                 console.log("📥 Received Order:", orderData);
 
-                const { user_id, items, shippingDetails } = orderData;
+                const { payment_id, user_id, items, shippingDetails } = orderData;
                 const { street, city, state, country, pincode } = shippingDetails;
                 try {
                     // Calculating the total price
@@ -33,7 +33,8 @@ exports.processOrders = async () => {
                     const order = await Order.create({
                         user_id,
                         total_amount: total_price,
-                        address_id
+                        address_id,
+                        payment_id
                     });
 
                     // Insert into OrderItems table
