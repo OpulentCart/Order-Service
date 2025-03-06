@@ -6,13 +6,12 @@ const { sendOrderConfirmationMail } = require("./orderMailService");
 const { sequelize } = require("../config/dbConfig");
 const { QueryTypes } = require("sequelize");
 
-const RABBITMQ_URL = "amqp://localhost"; // Change if using cloud-based RabbitMQ
 const ORDER_QUEUE = "orders";
 const NOTIFICATION_QUEUE = "notifications";
 
 exports.processOrders = async () => {
     try {
-        const connection = await amqp.connect(RABBITMQ_URL);
+        const connection = await amqp.connect(process.env.RABBITMQ_URL);
         const channel = await connection.createChannel();
 
         await channel.assertQueue(ORDER_QUEUE, { durable: true });

@@ -178,6 +178,8 @@ exports.updateStatusOfOrderItem = async (req, res) => {
             { where: { order_id: orderId } }
         );
 
+        
+
         return res.status(200).json({ success: true, message: "Order status updated successfully" });
     } catch (error) {
         console.error("❌ Error updating order status:", error.message);

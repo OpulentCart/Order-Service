@@ -47,3 +47,7 @@ exports.sendOrderConfirmationMail = async ({ to, order_id, totalAmount, delivery
     await transporter.sendMail(mailOptions);
     console.log(`📨 Order confirmation email sent to ${to}`);
 };
+
+exports.sendOrderItemUpdateMail = async ({ to, order_id }) => {
+
+};
